@@ -9,8 +9,6 @@ import warnings
 warnings.filterwarnings('ignore')
 import wrangle as w
 
-df = w.acquire_zillow()
-
 def get_counties(df):
     '''
     This function will create dummy variables out of the original fips column. 
@@ -26,7 +24,7 @@ def get_counties(df):
     # concatenate the dataframe with the 3 county columns to the original dataframe
     df_dummies = pd.concat([df, county_df], axis = 1)
     # drop regionidcounty and fips columns
-    df_dummies = df_dummies.drop(columns = ['regionidcounty'])
+    df_dummies = df_dummies.drop(columns = ['region_id_county'])
     return df_dummies
 
 
