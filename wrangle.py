@@ -92,6 +92,44 @@ def prepare_zillow(df):
     #Drop remainder of rows with null values
     df = df.dropna()
     
+    #Rename columns to something readable
+    rename_dict = {
+    'parcelid':'parcel_id', 'basementsqft':'basement_sqft',
+    'bathroomcnt':'bath_count', 'bedroomcnt':'bed_count',
+       'calculatedbathnbr':'calc_bath_and_bed','finishedfloor1squarefeet':'finished_floor1_sqft',
+       'calculatedfinishedsquarefeet':'calc_sqft', 'finishedsquarefeet12':'finished_sqft12',
+       'finishedsquarefeet13':'finished_sqft13', 'finishedsquarefeet15':'finished_sqft15',
+        'finishedsquarefeet50':'finished_sqft50',
+       'finishedsquarefeet6':'finished_sqft6', 'fireplacecnt':'fireplace_cnt',
+        'fullbathcnt':'full_bath_cnt',
+       'garagecarcnt':'garage_car_count', 'garagetotalsqft':'garage_sqft',
+       'hashottuborspa':'has_hot_tub',
+        'lotsizesquarefeet':'lot_sqft', 'poolcnt':'pool_count', 'poolsizesum':'sum_pool_size',
+        'propertycountylandusecode':'property_county_use_code',
+        'propertyzoningdesc':'property_zoning_desc',
+       'rawcensustractandblock':'raw_census_tract_block', 'regionidcity':'region_id_city',
+        'regionidcounty':'region_id_county',
+       'regionidneighborhood':'region_id_neighbor', 'regionidzip':'region_id_zip',
+        'roomcnt':'room_count', 'threequarterbathnbr':'three_quarter_bath',
+       'unitcnt':'unit_count', 'yardbuildingsqft17':'yard_building_sqft17',
+        'yardbuildingsqft26':'yard_building_sqft26', 'yearbuilt':'year_built',
+       'numberofstories':'no_stories', 'fireplaceflag':'fireplace_flag',
+        'structuretaxvaluedollarcnt':'structure_tax_value',
+       'taxvaluedollarcnt':'tax_value', 'assessmentyear':'assessment_year',
+        'landtaxvaluedollarcnt':'land_value',
+       'taxamount':'tax_amount', 'taxdelinquencyflag':'tax_delinquency_flag',
+       'taxdelinquencyyear':'tax_delinquency_year',
+       'censustractandblock':'census_tract_and_block', 'logerror':'log_error',
+       'transactiondate':'transaction_date',
+       'airconditioningdesc':'air_conditioning_desc',
+       'architecturalstyledesc':'architectural_style_desc',
+       'buildingclassdesc':'building_class_desc',
+       'heatingorsystemdesc':'heating_system_desc', 'propertylandusedesc':'property_land_use_desc',
+        'storydesc':'story_desc',
+       'typeconstructiondesc':'type_construction_desc'
+                }
+    df = df.rename(columns=rename_dict)
+    
     return df  
 
 
