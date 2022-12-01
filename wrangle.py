@@ -84,7 +84,9 @@ def prepare_zillow(df):
     df = handle_missing_values(df, prop_required_columns=.5, prop_required_rows=.75)
     
     #Drop columns with too many null values/extraneous information
-    df = df.drop(columns=['buildingqualitytypeid','propertyzoningdesc','unitcnt','heatingorsystemdesc','id', 'id.1','heatingorsystemtypeid'])
+    df = df.drop(columns=['buildingqualitytypeid','propertyzoningdesc','unitcnt','heatingorsystemdesc','id', 'id.1',
+                          'heatingorsystemtypeid', 'taxdelinquencyflag', 'transactiondate', 'typeconstructiondesc', 
+                          'propertylandusedesc']) 
     
     #Replace a whitespace sequence or empty with a NaN value and reassign this manipulation to df. 
     df = df.replace(r'^\s*$', np.nan, regex=True)

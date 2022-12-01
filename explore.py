@@ -11,7 +11,7 @@ import wrangle as w
 
 df = w.acquire_zillow()
 
-def get_counties():
+def get_counties(df):
     '''
     This function will create dummy variables out of the original fips column. 
     And return a dataframe with all of the original columns except regionidcounty.
@@ -31,30 +31,30 @@ def get_counties():
 
 
 def create_features(df):
-    df['age'] = 2017 - df.yearbuilt
+    df['age'] = 2017 - df.year_built
     df['age_bin'] = pd.cut(df.age, 
                            bins = [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
                            labels = [0, .066, .133, .20, .266, .333, .40, .466, .533, 
                                      .60, .666, .733, .8, .866, .933])
 
     # create taxrate variable
-    df['taxrate'] = df.taxamount/df.taxvaluedollarcnt*100
+    df['taxrate'] = df.tax_amount/df.tax_value*100
 
     # create acres variable
-    df['acres'] = df.lotsizesquarefeet/43560
+    df['acres'] = df.lot_sqft/43560
 
     # bin acres
     df['acres_bin'] = pd.cut(df.acres, bins = [0, .10, .15, .25, .5, 1, 5, 10, 20, 50, 200], 
                        labels = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9])
 
     # square feet bin
-    df['sqft_bin'] = pd.cut(df.calculatedfinishedsquarefeet, 
+    df['sqft_bin'] = pd.cut(df.calc_sqft, 
                             bins = [0, 800, 1000, 1250, 1500, 2000, 2500, 3000, 4000, 7000, 12000],
                             labels = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9]
                        )
 
     # dollar per square foot-structure
-    df['structure_dollar_per_sqft'] = df.structuretaxvaluedollarcnt/df.calculatedfinishedsquarefeet
+    df['structure_dollar_per_sqft'] = df.structure_tax_value/df.calc_sqft
 
 
     df['structure_dollar_sqft_bin'] = pd.cut(df.structure_dollar_per_sqft, 
@@ -64,7 +64,7 @@ def create_features(df):
 
 
     # dollar per square foot-land
-    df['land_dollar_per_sqft'] = df.landtaxvaluedollarcnt/df.lotsizesquarefeet
+    df['land_dollar_per_sqft'] = df.land_value/df.lot_sqft
 
     df['lot_dollar_sqft_bin'] = pd.cut(df.land_dollar_per_sqft, bins = [0, 1, 5, 20, 50, 100, 250, 500, 1000, 1500, 2000],
                                        labels = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9]
@@ -77,10 +77,10 @@ def create_features(df):
 
 
     # ratio of bathrooms to bedrooms
-    df['bath_bed_ratio'] = df.bathroomcnt/df.bedroomcnt
+    df['bath_bed_ratio'] = df.bath_count/df.bed_count
 
     # 12447 is the ID for city of LA. 
     # I confirmed through sampling and plotting, as well as looking up a few addresses.
-    df['cola'] = df['regionidcity'].apply(lambda x: 1 if x == 12447.0 else 0)
+    df['cola'] = df['region_id_city'].apply(lambda x: 1 if x == 12447.0 else 0)
 
     return df
