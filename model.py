@@ -65,6 +65,27 @@ def model_prep(train, validate, test):
 
 
 
+def scale_data(train_X, validate_X, test_X):
+    # Scale the data
+    scaler = sklearn.preprocessing.MinMaxScaler()
+
+    # Fit the scaler
+    scaler.fit(train_X)
+
+    # Use the scaler to transform train, validate, test
+    X_train_scaled = scaler.transform(train_X)
+    X_validate_scaled = scaler.transform(validate_X)
+    X_test_scaled = scaler.transform(test_X)
+
+
+    # Turn everything into a dataframe
+    X_train_scaled = pd.DataFrame(X_train_scaled, columns=train_X.columns)
+    X_validate_scaled = pd.DataFrame(X_validate_scaled, columns=train_X.columns)
+    X_test_scaled = pd.DataFrame(X_test_scaled, columns=train_X.columns)
+    return X_train_scaled, X_validate_scaled, X_test_scaled
+
+
+
 
 def get_mean_median(train_y, validate_y):
     # We need y_train and y_validate to be dataframes to append the new columns with predicted values.
@@ -94,3 +115,120 @@ def get_mean_median(train_y, validate_y):
     rmse_validate = mean_squared_error(y_validate.log_error, y_validate.log_error_pred_median) ** .5
     print("RMSE using Median\nTrain/In-Sample: ", round(rmse_train, 3), 
       "\nValidate/Out-of-Sample: ", round(rmse_validate, 3))
+    
+    
+    
+    
+def make_metric_df(y, y_pred, model_name, metric_df):
+    if metric_df.size ==0:
+        metric_df = pd.DataFrame(data=[
+            {
+                'model': model_name, 
+                'RMSE_validate': mean_squared_error(
+                    y,
+                    y_pred) ** .5,
+                'r^2_validate': explained_variance_score(
+                    y,
+                    y_pred)
+            }])
+        return metric_df
+    else:
+        return metric_df.append(
+            {
+                'model': model_name, 
+                'RMSE_validate': mean_squared_error(
+                    y,
+                    y_pred) ** .5,
+                'r^2_validate': explained_variance_score(
+                    y,
+                    y_pred)
+            }, ignore_index=True)
+    
+    
+    
+    
+def linear_regression(train_X, train_y, validate_X, validate_y):
+    lm = LinearRegression(normalize=True)
+    lm.fit(train_X, train_y.log_error)
+    train_y['log_error_pred_lm'] = lm.predict(train_X)
+    
+    # evaluate: rmse
+    rmse_train = mean_squared_error(train_y.log_error, train_y.log_error_pred_lm) ** (1/2)
+
+    # predict validate
+    validate_y['log_error_pred_lm'] = lm.predict(validate_X)
+
+    # evaluate: rmse
+    rmse_validate = mean_squared_error(validate_y.log_error, validate_y.log_error_pred_lm) ** (1/2)
+
+    print("RMSE for OLS using LinearRegression\nTraining/In-Sample: ", rmse_train, 
+      "\nValidation/Out-of-Sample: ", rmse_validate)
+    return rmse_train, rmse_validate
+
+
+
+
+def lassolars(train_X, train_y, validate_X, validate_y):
+    # create the model object
+    lars = LassoLars(alpha=1)
+
+    # fit the model to our training data. We must specify the column in y_train, 
+    # since we have converted it to a dataframe from a series!
+    lars.fit(train_X, train_y.log_error)
+
+    # predict train
+    train_y['log_error_pred_lars'] = lars.predict(train_X)
+
+    # evaluate: rmse
+    rmse_train = mean_squared_error(train_y.log_error, train_y.log_error_pred_lars) ** (1/2)
+
+    # predict validate
+    validate_y['log_error_pred_lars'] = lars.predict(validate_X)
+
+    # evaluate: rmse
+    rmse_validate = mean_squared_error(validate_y.log_error, validate_y.log_error_pred_lars) ** (1/2)
+
+    print("RMSE for Lasso + Lars\nTraining/In-Sample: ", rmse_train, 
+      "\nValidation/Out-of-Sample: ", rmse_validate)
+    return rmse_train, rmse_validate
+
+
+
+
+def polynomial(train_X, train_y, validate_X, validate_y, test_X):
+    # make the polynomial features to get a new set of features
+    pf = PolynomialFeatures(degree=2)
+
+    # fit and transform X_train_scaled
+    X_train_degree2 = pf.fit_transform(train_X)
+
+    # transform X_validate_scaled & X_test_scaled
+    X_validate_degree2 = pf.transform(validate_X)
+    X_test_degree2 =  pf.transform(test_X)
+    
+    # create the model object
+    lm2 = LinearRegression(normalize=True)
+
+    # fit the model to our training data. We must specify the column in y_train, 
+    # since we have converted it to a dataframe from a series! 
+    lm2.fit(X_train_degree2, train_y.log_error)
+
+    # predict train
+    train_y['log_error_pred_lm2'] = lm2.predict(X_train_degree2)
+
+    # evaluate: rmse
+    rmse_train = mean_squared_error(train_y.log_error, train_y.log_error_pred_lm2) ** (1/2)
+
+    # predict validate
+    validate_y['log_error_pred_lm2'] = lm2.predict(X_validate_degree2)
+
+    # evaluate: rmse
+    rmse_validate = mean_squared_error(validate_y.log_error, validate_y.log_error_pred_lm2) ** 0.5
+
+    print("RMSE for Polynomial Model, degrees=2\nTraining/In-Sample: ", rmse_train, 
+      "\nValidation/Out-of-Sample: ", rmse_validate)
+    return rmse_train, rmse_validate
+
+
+
+
