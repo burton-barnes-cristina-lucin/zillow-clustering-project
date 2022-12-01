@@ -10,6 +10,8 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import explained_variance_score
 from sklearn.linear_model import LinearRegression, LassoLars, TweedieRegressor
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import MinMaxScaler, RobustScaler
+from sklearn.cluster import KMeans
 
 # acquire
 from env import get_db_url
@@ -65,24 +67,35 @@ def model_prep(train, validate, test):
 
 
 
-def scale_data(train_X, validate_X, test_X):
-    # Scale the data
-    scaler = sklearn.preprocessing.MinMaxScaler()
-
-    # Fit the scaler
-    scaler.fit(train_X)
-
-    # Use the scaler to transform train, validate, test
-    X_train_scaled = scaler.transform(train_X)
-    X_validate_scaled = scaler.transform(validate_X)
-    X_test_scaled = scaler.transform(test_X)
-
-
-    # Turn everything into a dataframe
-    X_train_scaled = pd.DataFrame(X_train_scaled, columns=train_X.columns)
-    X_validate_scaled = pd.DataFrame(X_validate_scaled, columns=train_X.columns)
-    X_test_scaled = pd.DataFrame(X_test_scaled, columns=train_X.columns)
-    return X_train_scaled, X_validate_scaled, X_test_scaled
+def scale_data(train, 
+               validate, 
+               test, 
+               columns_to_scale=['latitude', 'longitude', 'age'],return_scaler=False):
+    '''This function takes in train, validate, test, and outputs scaled data based on
+    the chosen method (quantile scaling) using the columns selected as the only columns
+    that will be scaled. This function also returns the scaler object as an array if set 
+    to true'''
+    # make copies of our original data
+    train_scaled = train.copy()
+    validate_scaled = validate.copy()
+    test_scaled = test.copy()
+     # select a scaler
+    scaler = MinMaxScaler()
+     # fit on train
+    scaler.fit(train[columns_to_scale])
+    # applying the scaler:
+    train_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(train[columns_to_scale]),
+                                                  columns=train[columns_to_scale].columns.values).set_index([train.index.values])
+                                                  
+    validate_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(validate[columns_to_scale]),
+                                                  columns=validate[columns_to_scale].columns.values).set_index([validate.index.values])
+    
+    test_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(test[columns_to_scale]),
+                                                 columns=test[columns_to_scale].columns.values).set_index([test.index.values])
+    if return_scaler:
+        return scaler, train_scaled, validate_scaled, test_scaled
+    else:
+        return train_scaled, validate_scaled, test_scaled
 
 
 
@@ -230,5 +243,58 @@ def polynomial(train_X, train_y, validate_X, validate_y, test_X):
     return rmse_train, rmse_validate
 
 
-
+def make_clusters(train,validate,test):
+    #scale the data
+    train_scaled, validate_scaled, test_scaled= scale_data(train,validate,test, columns_to_scale =
+                                                       ['latitude','longitude','age','bath_bed_ratio', 'calc_sqft',
+                                                       'taxrate','structure_dollar_per_sqft','tax_value'])
+    #Make location cluster
+    location = train_scaled[['latitude','longitude','age']]
+    #Fit and predict location for k=4
+    kmeans = KMeans(n_clusters=4)
+    kmeans.fit(location)
+    kmeans.predict(location)
+    #Add column back to train scaled for this cluster
+    train_scaled['location_cluster'] = kmeans.predict(location)
+    
+    #Make Size cluster
+    size = train_scaled[['bath_bed_ratio','calc_sqft']]
+    #Fit and predict
+    kmeans = KMeans(n_clusters=4)
+    kmeans.fit(size)
+    kmeans.predict(size)
+    #Add column back to train scaled for this cluster
+    train_scaled['size_cluster'] = kmeans.predict(size)
+    
+    #Make value cluster
+    value = train_scaled[['tax_value','structure_dollar_per_sqft']]
+    #Fit and predict
+    kmeans = KMeans(n_clusters=4)
+    kmeans.fit(value)
+    kmeans.predict(value)
+    #Add column back to train scaled for this cluster
+    train_scaled['value_cluster'] = kmeans.predict(value)
+    
+    #Creating dummy variables from location cluster
+    dummy_1 = pd.get_dummies(train_scaled.location_cluster, columns=['loc_0','loc_1','loc_2','loc_3'])
+    # Concat these back onto df
+    train_scaled = pd.concat([train_scaled, dummy_1], axis=1)
+    #Rename clustered variables
+    train_scaled.rename(columns = {0:'loc_0',1:'loc_1',2:'loc_2',3:'loc_3'}, inplace = True)
+    
+    #Creating dummy variables from size cluster
+    dummy_2 = pd.get_dummies(train_scaled.size_cluster, columns=['size_0', 'size_1', 'size_2', 'size_3'])
+    # Concat these back onto df
+    train_scaled = pd.concat([train_scaled, dummy_2], axis=1)
+    #Rename clustered variables
+    train_scaled.rename(columns = {0:'size_0',1:'size_1',2:'size_2',3:'size_3'}, inplace = True)
+    
+    #Creating dummy variables from value cluster
+    dummy_3 = pd.get_dummies(train_scaled.value_cluster, columns=['value_0','value_1','value_2','value_3'])
+    # Concat these back onto df
+    train_scaled = pd.concat([train_scaled, dummy_3], axis=1)
+    #Rename clustered variables
+    train_scaled.rename(columns = {0:'value_0',1:'value_1',2:'value_2',3:'value_3'}, inplace = True)
+    
+    return train_scaled, validate_scaled, test_scaled
 
