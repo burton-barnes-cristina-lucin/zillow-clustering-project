@@ -232,3 +232,58 @@ def polynomial(train_X, train_y, validate_X, validate_y, test_X):
 
 
 
+def lassolars2(train_X, train_y, validate_X, validate_y):
+    # create the model object
+    lars = LassoLars(alpha=1)
+    
+    train_X = train_X.drop(['Orange',
+                 'LA',
+                 'Ventura',
+                 'age_bin',
+                 'taxrate',
+                 'acres',
+                 'acres_bin',
+                 'sqft_bin',
+                 'calc_sqft',
+                 'structure_dollar_per_sqft',
+                 'structure_dollar_sqft_bin',
+                 'land_dollar_per_sqft',
+                 'lot_dollar_sqft_bin',
+                 'bath_bed_ratio',
+                 'cola'], axis=1)
+
+    validate_X = validate_X.drop(['Orange',
+                 'LA',
+                 'Ventura',
+                 'age_bin',
+                 'taxrate',
+                 'acres',
+                 'acres_bin',
+                 'sqft_bin',
+                 'calc_sqft',
+                 'structure_dollar_per_sqft',
+                 'structure_dollar_sqft_bin',
+                 'land_dollar_per_sqft',
+                 'lot_dollar_sqft_bin',
+                 'bath_bed_ratio',
+                 'cola'], axis=1)
+    
+    # fit the model to our training data. We must specify the column in y_train, 
+    # since we have converted it to a dataframe from a series!
+    lars.fit(train_X, train_y.log_error)
+
+    # predict train
+    train_y['log_error_pred_lars'] = lars.predict(train_X)
+
+    # evaluate: rmse
+    rmse_train = mean_squared_error(train_y.log_error, train_y.log_error_pred_lars) ** (1/2)
+
+    # predict validate
+    validate_y['log_error_pred_lars'] = lars.predict(validate_X)
+
+    # evaluate: rmse
+    rmse_validate = mean_squared_error(validate_y.log_error, validate_y.log_error_pred_lars) ** (1/2)
+
+    print("RMSE for Lasso + Lars\nTraining/In-Sample: ", rmse_train, 
+      "\nValidation/Out-of-Sample: ", rmse_validate)
+    return rmse_train, rmse_validate
