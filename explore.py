@@ -81,4 +81,7 @@ def create_features(df):
     # I confirmed through sampling and plotting, as well as looking up a few addresses.
     df['cola'] = df['region_id_city'].apply(lambda x: 1 if x == 12447.0 else 0)
 
+    #Drop rows with null values created from calculations
+    df = df.dropna()
+    
     return df
