@@ -248,10 +248,12 @@ def make_clusters(train,validate,test):
     train_scaled, validate_scaled, test_scaled= scale_data(train,validate,test, columns_to_scale =
                                                        ['latitude','longitude','age','bath_bed_ratio', 'calc_sqft',
                                                        'taxrate','structure_dollar_per_sqft','tax_value'])
+    
+    #Set K value for clusters (Since all were 4)
+    kmeans = KMeans(n_clusters=4,random_state=123)
     #Make location cluster
     location = train_scaled[['latitude','longitude','age']]
     #Fit and predict location for k=4
-    kmeans = KMeans(n_clusters=4)
     kmeans.fit(location)
     kmeans.predict(location)
     #Add column back to train scaled for this cluster
@@ -260,7 +262,6 @@ def make_clusters(train,validate,test):
     #Make Size cluster
     size = train_scaled[['bath_bed_ratio','calc_sqft']]
     #Fit and predict
-    kmeans = KMeans(n_clusters=4)
     kmeans.fit(size)
     kmeans.predict(size)
     #Add column back to train scaled for this cluster
@@ -269,7 +270,6 @@ def make_clusters(train,validate,test):
     #Make value cluster
     value = train_scaled[['tax_value','structure_dollar_per_sqft']]
     #Fit and predict
-    kmeans = KMeans(n_clusters=4)
     kmeans.fit(value)
     kmeans.predict(value)
     #Add column back to train scaled for this cluster
