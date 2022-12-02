@@ -243,59 +243,44 @@ def polynomial(train_X, train_y, validate_X, validate_y, test_X):
     return rmse_train, rmse_validate
 
 
-def make_clusters(train,validate,test):
-    #scale the data
-    train_scaled, validate_scaled, test_scaled= scale_data(train,validate,test, columns_to_scale =
-                                                       ['latitude','longitude','age','bath_bed_ratio', 'calc_sqft',
-                                                       'taxrate','structure_dollar_per_sqft','tax_value'])
+def create_clusters(train, train_scaled, validate_scaled, test_scaled):
+    '''
+    Takes in train and train_scaled and creates clusters for the 
+    predefined features. Returns train data with clusters as feature columns
+    '''
+    kmeans_scale4 = KMeans(n_clusters=4, random_state=123)
     
-    #Set K value for clusters (Since all were 4)
-    kmeans = KMeans(n_clusters=4,random_state=123)
-    #Make location cluster
-    location = train_scaled[['latitude','longitude','age']]
-    #Fit and predict location for k=4
-    kmeans.fit(location)
-    kmeans.predict(location)
-    #Add column back to train scaled for this cluster
-    train_scaled['location_cluster'] = kmeans.predict(location)
+    #make location cluster with latitude, longitude and age
+    kmeans_scale4.fit(train_scaled[['latitude', 'longitude', 'age']])
+    train['location_cluster'] = kmeans_scale4.predict(train_scaled[['latitude', 'longitude', 'age']])
+    train_scaled['location_cluster'] = kmeans_scale4.predict(train_scaled[['latitude', 'longitude', 'age']])
+    validate_scaled['location_cluster'] = kmeans_scale4.predict(validate_scaled[['latitude', 'longitude', 'age']])
+    test_scaled['location_cluster'] = kmeans_scale4.predict(test_scaled[['latitude', 'longitude', 'age']])
+
+    #make size cluster with bath bed ratio and calc sqft
+    kmeans_scale4.fit(train_scaled[['bath_bed_ratio','calc_sqft']])
+    train['size_cluster'] = kmeans_scale4.predict(train_scaled[['bath_bed_ratio','calc_sqft']])
+    train_scaled['size_cluster'] = kmeans_scale4.predict(train_scaled[['bath_bed_ratio','calc_sqft']])
+    validate_scaled['size_cluster'] = kmeans_scale4.predict(validate_scaled[['bath_bed_ratio','calc_sqft']])
+    test_scaled['size_cluster'] = kmeans_scale4.predict(test_scaled[['bath_bed_ratio','calc_sqft']])
     
-    #Make Size cluster
-    size = train_scaled[['bath_bed_ratio','calc_sqft']]
-    #Fit and predict
-    kmeans.fit(size)
-    kmeans.predict(size)
-    #Add column back to train scaled for this cluster
-    train_scaled['size_cluster'] = kmeans.predict(size)
+    #make value cluster with tax value and structure dollar square feet
+    kmeans_scale4.fit(train_scaled[['tax_value','structure_dollar_per_sqft']])
+    train['value_cluster'] = kmeans_scale4.predict(train_scaled[['tax_value','structure_dollar_per_sqft']])
+    train_scaled['value_cluster'] = kmeans_scale4.predict(train_scaled[['tax_value','structure_dollar_per_sqft']])
+    validate_scaled['value_cluster'] = kmeans_scale4.predict(validate_scaled[['tax_value','structure_dollar_per_sqft']])
+    test_scaled['value_cluster'] = kmeans_scale4.predict(test_scaled[['tax_value','structure_dollar_per_sqft']])
     
-    #Make value cluster
-    value = train_scaled[['tax_value','structure_dollar_per_sqft']]
-    #Fit and predict
-    kmeans.fit(value)
-    kmeans.predict(value)
-    #Add column back to train scaled for this cluster
-    train_scaled['value_cluster'] = kmeans.predict(value)
-    
-    #Creating dummy variables from location cluster
-    dummy_1 = pd.get_dummies(train_scaled.location_cluster, columns=['loc_0','loc_1','loc_2','loc_3'])
-    # Concat these back onto df
-    train_scaled = pd.concat([train_scaled, dummy_1], axis=1)
-    #Rename clustered variables
-    train_scaled.rename(columns = {0:'loc_0',1:'loc_1',2:'loc_2',3:'loc_3'}, inplace = True)
-    
-    #Creating dummy variables from size cluster
-    dummy_2 = pd.get_dummies(train_scaled.size_cluster, columns=['size_0', 'size_1', 'size_2', 'size_3'])
-    # Concat these back onto df
-    train_scaled = pd.concat([train_scaled, dummy_2], axis=1)
-    #Rename clustered variables
-    train_scaled.rename(columns = {0:'size_0',1:'size_1',2:'size_2',3:'size_3'}, inplace = True)
-    
-    #Creating dummy variables from value cluster
-    dummy_3 = pd.get_dummies(train_scaled.value_cluster, columns=['value_0','value_1','value_2','value_3'])
-    # Concat these back onto df
-    train_scaled = pd.concat([train_scaled, dummy_3], axis=1)
-    #Rename clustered variables
-    train_scaled.rename(columns = {0:'value_0',1:'value_1',2:'value_2',3:'value_3'}, inplace = True)
-    
+    return train, train_scaled, validate_scaled, test_scaled
+
+
+def encode_cat_features(train_scaled, validate_scaled, test_scaled, dummy_cols):
+    train_scaled = pd.get_dummies(data = train_scaled, columns=dummy_cols)
+
+    validate_scaled = pd.get_dummies(data=validate_scaled, columns=dummy_cols)
+
+    test_scaled = pd.get_dummies(data= test_scaled, columns=dummy_cols)
+
     return train_scaled, validate_scaled, test_scaled
 
 def lassolars2(train_X, train_y, validate_X, validate_y):
