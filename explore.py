@@ -111,7 +111,7 @@ def zestimate(train):
     
 #Visualizations 3
 def loc_cluster_viz(train):
-    '''This function visualizes Location Cluster One'''
+    '''This function visualizes Location Clusters with their features'''
     #Set Theme
     sns.set_theme()
     #Set Plot Size
@@ -123,4 +123,20 @@ def loc_cluster_viz(train):
     ax.set(xlabel='Latitude',
         ylabel='Longitude',
         title='Location Cluster 1 is the Most Significant Driver of Log Error')
+    plt.show()
+    
+#Visualization 4
+def size_cluster_viz(train):
+    '''This function visualizes size clusters with their features'''
+    #Set Theme
+    sns.set_theme()
+    #Set Plot Size
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 7)
+    #Make the Plot
+    ax = sns.scatterplot(data=train, x="bath_bed_ratio", y="calc_sqft", hue='size_cluster', palette='YlGnBu')
+    #Specify Axis labels
+    ax.set(xlabel='Bathroom Bedroom Ratio',
+        ylabel='Calculated Finished Square Feet',
+        title='Size Cluster 3 Has a Significant Difference in Log Error')
     plt.show()
