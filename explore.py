@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
+from scipy import stats
+from scipy.stats import levene, f_oneway
 import warnings
 warnings.filterwarnings('ignore')
 import wrangle as w
@@ -157,3 +159,44 @@ def value_cluster_viz(train):
         ylabel='Cost Per Square Feet ($)',
         title='Value Cluster 1 Has a Significant Difference in Log Error')
     plt.show()
+    
+##------------------Statistical Testing------------------##
+
+def location_ttest(train):
+    '''This function creates a series from location cluster 1 and conducts a 1 sample
+    T-test comparing the cluster log error to train mean log error'''
+    overall_mean = train.log_error.mean()
+    alpha = 0.05
+
+    loc_cluster_one = train[train.location_cluster == 1].log_error
+    population_mean = train.log_error.mean()
+
+    t, p = stats.ttest_1samp(loc_cluster_one, overall_mean)
+
+    print(f'Test Statistic: {t.round(2)}, P-Value: {p.round(2)}')
+    
+def size_ttest(train):
+    '''This function creates a series from size cluster 3 and conducts a 1 sample
+    T-test comparing the cluster log error to train mean log error'''
+    overall_mean = train.log_error.mean()
+    alpha = 0.05
+
+    size_cluster_three = train[train.size_cluster == 3].log_error
+    population_mean = train.log_error.mean()
+
+    t, p = stats.ttest_1samp(size_cluster_three, overall_mean)
+
+    print(f'Test Statistic: {t.round(2)}, P-Value: {p.round(2)}')
+    
+def value_ttest(train):
+    '''This function creates a series from value cluster 1 and conducts a 1 sample
+    T-test comparing the cluster log error to train mean log error'''
+    overall_mean = train.log_error.mean()
+    alpha = 0.05
+
+    value_cluster_one = train[train.value_cluster == 1].log_error
+    population_mean = train.log_error.mean()
+
+    t, p = stats.ttest_1samp(value_cluster_one, overall_mean)
+
+    print(f'Test Statistic: {t.round(2)}, P-Value: {p.round(2)}')
