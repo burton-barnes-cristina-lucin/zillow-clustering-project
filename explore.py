@@ -140,3 +140,20 @@ def size_cluster_viz(train):
         ylabel='Calculated Finished Square Feet',
         title='Size Cluster 3 Has a Significant Difference in Log Error')
     plt.show()
+    
+#Visualization 5
+
+def value_cluster_viz(train):
+    '''This function creates a visualization of Value features, hued by clusters'''
+    #Set Theme
+    sns.set_theme()
+    #Set Plot Size
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 7)
+    #Make the Plot
+    ax = sns.scatterplot(data=train, x="tax_value", y="structure_dollar_per_sqft", hue='value_cluster', palette='Paired')
+    #Specify Axis labels
+    ax.set(xlabel='Tax Value ($)',
+        ylabel='Cost Per Square Feet ($)',
+        title='Value Cluster 1 Has a Significant Difference in Log Error')
+    plt.show()
