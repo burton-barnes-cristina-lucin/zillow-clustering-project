@@ -90,18 +90,53 @@ def create_features(df):
     return df
 
 
+####-----------------------Visualizations-----------------------###
 
-# Graph that shows the distribution of log_error using a histogram
+# Visualization 1
 def logerror_distribution(train):
+    '''This function makes a chart of the target variable, log error'''
     sns.histplot(x='log_error',bins= 30, data=train)
     plt.title('Distribution of Log_error')
     plt.show()
 
     
-# graph that returns the zestimate of a property undervaluing or undervaluing a property
+# Visualization 2
 def zestimate(train):
+    '''This function makes a chart showing the difference in undervalued and overvalued Zestimates'''
     train['overvalue'] = train.log_error > 0
     sns.histplot(train.overvalue, bins=3)
     plt.xticks([0,1])
     plt.title('Overvaluations of Houses')
+    plt.show()
+    
+#Visualizations 3
+def loc_cluster_viz(train):
+    '''This function visualizes Location Clusters with their features'''
+    #Set Theme
+    sns.set_theme()
+    #Set Plot Size
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 7)
+    #Make the Plot
+    ax = sns.scatterplot(data=train, x="latitude", y="longitude", hue='location_cluster', palette='Blues')
+    #Specify Axis labels
+    ax.set(xlabel='Latitude',
+        ylabel='Longitude',
+        title='Location Cluster 1 is the Most Significant Driver of Log Error')
+    plt.show()
+    
+#Visualization 4
+def size_cluster_viz(train):
+    '''This function visualizes size clusters with their features'''
+    #Set Theme
+    sns.set_theme()
+    #Set Plot Size
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 7)
+    #Make the Plot
+    ax = sns.scatterplot(data=train, x="bath_bed_ratio", y="calc_sqft", hue='size_cluster', palette='YlGnBu')
+    #Specify Axis labels
+    ax.set(xlabel='Bathroom Bedroom Ratio',
+        ylabel='Calculated Finished Square Feet',
+        title='Size Cluster 3 Has a Significant Difference in Log Error')
     plt.show()
