@@ -19,11 +19,11 @@ The initial thoughts are that people overvalue their house and that
 
 * Explore data in search of what causes log_error
     * Answer the following initial questions
-        * 
-        * 
-        * 
-        * 
-        * 
+        * What is the distribution of logerror?
+        * Is a property more likely to over evaluated or under evaluated?
+        * If we cluster location data with home age, is there a relationship with log error?
+        * If we cluster size features(Bath bed ratio and calculated finished squarte feet), is there a relationship with log error?
+        * If we cluster value features(tax value, structure dollar square feet), is there a relationship with log error?
         
 * Develop a Model to predict the log_error
     * Use drivers identified in explore to build predictive models of different types
@@ -68,11 +68,13 @@ The initial thoughts are that people overvalue their house and that
 4) Run notebook.
 
 # Takeaways and Conclusions
-*
-*
+* Distribution is very minimal and is even across positive and negative log error
+* Property is more likely to be over valued than under
+* There is a relationship  between location and log error
+* Properties with a higher finished square feet are more likely to have log error
 *
 
 # Recommendations
-*
-*
-*
+* 
+* 
+* 
