@@ -88,3 +88,20 @@ def create_features(df):
     df = df.dropna()
     
     return df
+
+
+
+# Graph that shows the distribution of log_error using a histogram
+def logerror_distribution(train):
+    sns.histplot(x='log_error',bins= 30, data=train)
+    plt.title('Distribution of Log_error')
+    plt.show()
+
+    
+# graph that returns the zestimate of a property undervaluing or undervaluing a property
+def zestimate(train):
+    train['overvalue'] = train.log_error > 0
+    sns.histplot(train.overvalue, bins=3)
+    plt.xticks([0,1])
+    plt.title('Overvaluations of Houses')
+    plt.show()
