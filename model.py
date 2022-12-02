@@ -287,36 +287,12 @@ def lassolars2(train_X, train_y, validate_X, validate_y):
     # create the model object
     lars = LassoLars(alpha=1)
     
-    train_X = train_X.drop(['Orange',
-                 'LA',
-                 'Ventura',
-                 'age_bin',
+    train_X = train_X.drop([
                  'taxrate',
-                 'acres',
-                 'acres_bin',
-                 'sqft_bin',
-                 'calc_sqft',
-                 'structure_dollar_per_sqft',
-                 'structure_dollar_sqft_bin',
-                 'land_dollar_per_sqft',
-                 'lot_dollar_sqft_bin',
-                 'bath_bed_ratio',
                  'cola'], axis=1)
 
-    validate_X = validate_X.drop(['Orange',
-                 'LA',
-                 'Ventura',
-                 'age_bin',
+    validate_X = validate_X.drop([
                  'taxrate',
-                 'acres',
-                 'acres_bin',
-                 'sqft_bin',
-                 'calc_sqft',
-                 'structure_dollar_per_sqft',
-                 'structure_dollar_sqft_bin',
-                 'land_dollar_per_sqft',
-                 'lot_dollar_sqft_bin',
-                 'bath_bed_ratio',
                  'cola'], axis=1)
     
     # fit the model to our training data. We must specify the column in y_train, 
@@ -338,3 +314,16 @@ def lassolars2(train_X, train_y, validate_X, validate_y):
     print("RMSE for Lasso + Lars\nTraining/In-Sample: ", rmse_train, 
       "\nValidation/Out-of-Sample: ", rmse_validate)
     return rmse_train, rmse_validate
+
+
+
+def linear_regression_test(test_X, test_y):
+    lm = LinearRegression(normalize=True)
+    lm.fit(test_X, test_y.log_error)
+    test_y['log_error_pred_lm'] = lm.predict(test_X)
+    
+    # evaluate: rmse
+    rmse_test = mean_squared_error(test_y.log_error, test_y.log_error_pred_lm) ** (1/2)
+
+    print("RMSE for OLS using LinearRegression\nTest/In-Sample: ", rmse_test)
+    return rmse_test
