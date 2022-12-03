@@ -1,17 +1,17 @@
 # Zillow Clustering Project
 ## Project Description
 
-Zillow is a billion dollar real estate business that sells thousands of houses in the state of California alone. We have decided to look into log_error, the overvaluation or undervalution of a houses worth. We will look into what features if any influence the amount of log_error and create a model to estimate the houses value.
+Zillow is a billion dollar real estate business that sells thousands of houses in the state of California alone. We have decided to look into log error, the overvaluation or undervalution of a houses' worth. We will look into what features if any influence the amount of log error and create a model to estimate the log error for properties.
 
 # Project Goal
 
-* Discover driver of log_error from the zillow database.
-* Use drivers to develop machine learning model to predict log_error
+* Discover driver of log error from the Zillow data
+* Use drivers to develop machine learning model to predict log error
 * This information will be used to further our understanding of which elements contribute to or detract from a log_error.
 
 # Initial Thoughts
 
-The initial thoughts are that people overvalue their house and that
+* Log Error is driven by certain home features, such as size, location, or value metrics.
 
 # The Plan
 
@@ -22,10 +22,10 @@ The initial thoughts are that people overvalue their house and that
         * What is the distribution of logerror?
         * Is a property more likely to over evaluated or under evaluated?
         * If we cluster location data with home age, is there a relationship with log error?
-        * If we cluster size features(Bath bed ratio and calculated finished squarte feet), is there a relationship with log error?
+        * If we cluster size features(Bath bed ratio and calculated finished square feet), is there a relationship with log error?
         * If we cluster value features(tax value, structure dollar square feet), is there a relationship with log error?
         
-* Develop a Model to predict the log_error
+* Develop a Model to predict log error
     * Use drivers identified in explore to build predictive models of different types
     * Evaluate models on train and validate data
     * Select the best model to use on test data
@@ -62,19 +62,17 @@ The initial thoughts are that people overvalue their house and that
 |cola| Whether or not a residence is in the city of LA|
 
 # Steps to Reproduce
-1) Clone this repo.
-2) Aquire the data from SQL
-3) Put the data in  the file containing the cloned repo.
-4) Run notebook.
+1) Clone this repository
+2) Ensure an .env file is in the repo, with definitions of host, username, and password for the Codeup database
+2) Aquire the data from Codeup SQL database
+3) Put the data in  the file containing the cloned repo
+4) Run notebook
 
 # Takeaways and Conclusions
-* Distribution is very minimal and is even across positive and negative log error
-* Property is more likely to be over valued than under
-* There is a relationship  between location and log error
-* Properties with a higher finished square feet are more likely to have log error
-*
+* Feature engineering suburban vs. urban areas is likely to provide value to a model
+* Feature engineering neighborhoods within the three counties is likely to improve modeling
+* Additional creation of clusters could provide more insight into log error
 
-# Recommendations
-* 
-* 
-* 
+# Next Steps
+* Better data collection from real estate agents and brokers will help avoid missing values, which plague this dataset
+* Features that include amenities that are not part of a home, such as crime rate, distance from hospitals, and school districts are likely to add value to a model

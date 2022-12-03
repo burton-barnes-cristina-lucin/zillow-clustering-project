@@ -29,24 +29,17 @@ def model_prep(train, validate, test):
     
     # drop unused columns
     keep_cols = ['log_error',
-                 'Orange',
-                 'LA',
-                 'Ventura',
                  'age',
-                 'age_bin',
                  'taxrate',
-                 'acres',
-                 'acres_bin',
-                 'sqft_bin',
                  'latitude',
                  'longitude',
                  'calc_sqft',
                  'structure_dollar_per_sqft',
-                 'structure_dollar_sqft_bin',
-                 'land_dollar_per_sqft',
-                 'lot_dollar_sqft_bin',
                  'bath_bed_ratio',
-                 'cola'
+                 'cola',
+                 'location_cluster_1',
+                 'size_cluster_3',
+                 'value_cluster_1'
                 ]
     
     train = train[keep_cols]
@@ -325,5 +318,5 @@ def linear_regression_test(test_X, test_y):
     # evaluate: rmse
     rmse_test = mean_squared_error(test_y.log_error, test_y.log_error_pred_lm) ** (1/2)
 
-    print("RMSE for OLS using LinearRegression\nTest/In-Sample: ", rmse_test)
+    print("RMSE for OLS using LinearRegression\nTest/Out-of-Sample: ", rmse_test)
     return rmse_test

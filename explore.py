@@ -31,6 +31,11 @@ def get_counties(df):
 
 
 def create_features(df):
+    '''This function creates new features based on the original features from the data.
+    These features, including getting counties, are added back to the original dataframe'''
+    #Getting Counties
+    df = get_counties(df)
+    #Creating age and binning from year built
     df['age'] = 2017 - df.year_built
     df['age_bin'] = pd.cut(df.age, 
                            bins = [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
@@ -96,35 +101,56 @@ def create_features(df):
 
 # Visualization 1
 def logerror_distribution(train):
-    '''This function makes a chart of the target variable, log error'''
-    sns.histplot(x='log_error',bins= 30, data=train)
-    plt.title('Distribution of Log_error')
+    '''This function makes a histogram of the target variable, log error'''
+    #Set Style
+    sns.set_theme(style="darkgrid")
+    # Set figure size
+    plt.figure(figsize=(11,7))
+    # plot it
+    sns.histplot(data=train, x='log_error', color='#44cab9')
+    #Limit the axes so we can see more clearly
+    plt.xlim(-2,2)
+    plt.ylim(0,50)
+    plt.title('''Distribution of Log Error Appears Normal''')
+    #Label the Axes
+    plt.xlabel('Log Error')
+    plt.ylabel('Count of Properties')
     plt.show()
 
     
 # Visualization 2
 def zestimate(train):
     '''This function makes a chart showing the difference in undervalued and overvalued Zestimates'''
+    #Set figure size
+    plt.figure(figsize=(11,7))
+    #Create variable for value
     train['overvalue'] = train.log_error > 0
-    sns.histplot(train.overvalue, bins=3)
+    #Make the plot
+    ax = sns.histplot(train.overvalue, bins=3)
+    # Add axes labels and ticks
     plt.xticks([0,1])
-    plt.title('Overvaluations of Houses')
+    plt.xlabel('Homes with greater or less than zero log error')
+    plt.ylabel('Count of Homes')
+    plt.title('Zestimate is more likely to overvalue a home')
     plt.show()
     
-#Visualizations 3
+#Visualization 3
 def loc_cluster_viz(train):
     '''This function visualizes Location Clusters with their features'''
     #Set Theme
     sns.set_theme()
     #Set Plot Size
     fig, ax = plt.subplots()
-    fig.set_size_inches(12, 7)
+    fig.set_size_inches(11, 7)
     #Make the Plot
     ax = sns.scatterplot(data=train, x="latitude", y="longitude", hue='location_cluster', palette='Blues')
     #Specify Axis labels
     ax.set(xlabel='Latitude',
         ylabel='Longitude',
         title='Location Cluster 1 is the Most Significant Driver of Log Error')
+    #Hide scientific notation
+    ax.xaxis.get_offset_text().set_visible(False)
+    ax.yaxis.get_offset_text().set_visible(False)
     plt.show()
     
 #Visualization 4
@@ -136,7 +162,7 @@ def size_cluster_viz(train):
     fig, ax = plt.subplots()
     fig.set_size_inches(12, 7)
     #Make the Plot
-    ax = sns.scatterplot(data=train, x="bath_bed_ratio", y="calc_sqft", hue='size_cluster', palette='YlGnBu')
+    ax = sns.scatterplot(data=train, x="bath_bed_ratio", y="calc_sqft", hue='size_cluster', palette='PRGn')
     #Specify Axis labels
     ax.set(xlabel='Bathroom Bedroom Ratio',
         ylabel='Calculated Finished Square Feet',
@@ -155,9 +181,11 @@ def value_cluster_viz(train):
     #Make the Plot
     ax = sns.scatterplot(data=train, x="tax_value", y="structure_dollar_per_sqft", hue='value_cluster', palette='Paired')
     #Specify Axis labels
-    ax.set(xlabel='Tax Value ($)',
+    ax.set(xlabel='Tax Value ($) in ten millions',
         ylabel='Cost Per Square Feet ($)',
         title='Value Cluster 1 Has a Significant Difference in Log Error')
+    #Hide scientific notation
+    ax.xaxis.get_offset_text().set_visible(False)
     plt.show()
     
 ##------------------Statistical Testing------------------##
